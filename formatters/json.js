@@ -1,24 +1,8 @@
-#! /usr/bin/node
 "use strict";
 
 var fileSystem = require("fs");
 var filePath = require("path");
-var parseArgs = require("minimist");
-
-var argv = parseArgs(process.argv.slice(2));
-
-function main() {
-  try {
-    if ("table" in argv) {
-      var result = formatJsonToTable(argv.file);
-    } else {
-      var result = formatJsonFromFile(argv.file);
-    }
-    console.log(result);
-  } catch (error) {
-    console.error(error);
-  }
-}
+var messages = require('./consts.js');
 
 function formatJsonToTable(file) {
   var json = parseJsonFromFile(file);
@@ -27,13 +11,12 @@ function formatJsonToTable(file) {
 
 function formatJsonFromFile(file) {
   var json = parseJsonFromFile(file);
-  var formattedJson = JSON.stringify(json, null, 2);
+  var formattedJson = formatJson(json);
   return formattedJson;
 }
 
 function formatJson(json) {
-  var parsedJson = parseJson(json);
-  return JSON.stringify(parsedJson, null, 2);
+  return JSON.stringify(json, null, 2);
 }
 
 function parseJsonFromFile(file) {
@@ -43,15 +26,10 @@ function parseJsonFromFile(file) {
     return parsedJson;
   } catch (error) {
     if (errorCameFromSyntax(error)) {
-      console.error(
-        "Erro ao fazer um parse do json usado como argumento ",
-        json
-      );
+      console.error(messages.json.syntaxError, json);
     } else {
-      console.error(
-        "Error no arquivo json.js ao fazer o parse de um json na funcao formatJson"
-      );
-      console.error("*****************************");
+      console.error(messages.json.unexpectedError);   
+      console.error(messages.lineSeparator)
       console.error(error);
     }
   }
@@ -64,12 +42,8 @@ function readJsonFromFile(file) {
     var conteudoString = conteudoBuffer.toString();
     return conteudoString;
   } catch (error) {
-    console.error(
-      "Something went wrong while reading the file in function readJsonFromFile, problably file argument is missing"
-    );
-    console.error(
-      "***********************************************************"
-    );
+    console.error(messages.fileSystem.readFileError);
+    console.error(messages.lineSeparator);
     console.error(error.message);
   }
 }
@@ -79,8 +53,17 @@ function normalizeFilePath(file) {
   return currentWorkingPath;
 }
 
+function parseJson(string) {
+  return JSON.parse(string)
+}
+
 function errorCameFromSyntax(error) {
   return error instanceof SyntaxError;
 }
 
-console.log(main());
+module.exports = {
+  formatJsonFromFile,
+  formatJsonToTable,
+  formatJson,
+}
+

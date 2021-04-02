@@ -1,0 +1,54 @@
+#! /usr/bin/node
+/* eslint-disable no-undef */
+
+var fs = require("fs");
+var path = require("path");
+var parseArgs = require("minimist");
+var jsonFormat = require("./json.js");
+var { formatYaml } = require("./yaml");
+var { lineSeparator, lineSpacing } = require("./consts.js");
+
+var argv = parseArgs(process.argv.slice(2));
+
+main();
+
+function main() {
+  try {
+    if ("table" in argv) {
+      var result = jsonFormat.formatJsonToTable(argv.file);
+    } else if (argv.yaml) {
+      formatYaml(argv.file).then(function printYaml(yaml) {
+        promisifyWriteFile(`${path.basename(argv.file)}`, yaml).then(
+          function resolveWriteFile() {
+            console.log(`${path.basename(argv.file)} has been created!`);
+          }
+        );
+      });
+    } else {
+      var result = jsonFormat.formatJsonFromFile(argv.file);
+      writeFile(result);
+    }
+    console.log(result);
+  } catch (error) {
+    console.error(error);
+  }
+}
+
+function promisifyWriteFile(fileName, content) {
+  return new Promise(function resolveWriteFile(resolve) {
+    fs.writeFile(fileName, content, function writeFileCallback() {
+      resolve(fileName);
+    });
+  });
+}
+
+function writeFile(content) {
+  fs.writeFileSync("result_test.txt", content);
+}
+
+function printHelp() {
+  console.log(lineSeparator);
+  console.log("help command", lineSpacing, "--h");
+  console.log("--file", lineSpacing, "file location");
+  console.log("--write", lineSpacing, "write result to the disk?");
+}
