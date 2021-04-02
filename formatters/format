@@ -34,6 +34,8 @@ function main() {
   }
 }
 
+function createYaml
+
 function promisifyWriteFile(fileName, content) {
   return new Promise(function resolveWriteFile(resolve) {
     fs.writeFile(fileName, content, function writeFileCallback() {

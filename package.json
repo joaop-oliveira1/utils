@@ -18,9 +18,11 @@
   },
   "homepage": "https://github.com/joaop-oliveira1/utils#readme",
   "dependencies": {
-    "minimist": "^1.2.5"
+    "minimist": "^1.2.5",
+    "yaml": "^1.10.2"
   },
   "devDependencies": {
+    "eslint": "^7.23.0",
     "prettier": "^2.2.1"
   }
 }
